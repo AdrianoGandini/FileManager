@@ -15,7 +15,7 @@ public class Runner {
 			try {
 				backup.backup(source, target);
 			} catch (IOException e) {
-				System.out.println("Eror it was not possible to complete the backup!");
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
