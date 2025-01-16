@@ -24,8 +24,8 @@ public class FileBackupManager {
 		}
 	}
 	
-	private Path resolveDirectory(Path sourceDir, Path sourcetPath, Path targetDir) {
-		Path relativePath = sourceDir.relativize(sourcetPath);
+	private Path resolveDirectory(Path sourceDir, Path sourcePath, Path targetDir) {
+		Path relativePath = sourceDir.relativize(sourcePath);
 		return targetDir.resolve(relativePath);
 	}
 
@@ -47,6 +47,6 @@ public class FileBackupManager {
 	
 	public void backup(Path sourceDir, Path targetDir) throws IOException {
 		createDirectory(targetDir);
-		filesBeckup(sourceDir, targetDir);
+		//filesBeckup(sourceDir, targetDir);
 	}
 }
