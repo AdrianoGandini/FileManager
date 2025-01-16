@@ -6,17 +6,20 @@ import java.nio.file.Paths;
 
 public class Runner {
 	public static void main(String[] args) {
+		
 		Path source = Paths.get("Test");
         Path target = Paths.get("Backup");
 		
 		FileBackupManager backup = new FileBackupManager();
+
+			try {
+				backup.backup(source, target);
+			} catch (IOException e) {
+				System.out.println("Eror it was not possible to complete the backup!");
+				e.printStackTrace();
+			}
+			
+					
 		
-		try {
-			backup.backup(source, target);
-			
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }

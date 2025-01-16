@@ -11,16 +11,14 @@ import java.util.stream.Stream;
 public class FileBackupManager {
 	
 	
-
-	private void createDirectory(Path directoryPath) {
+	private void createDirectory(Path targetDir) {
 		try {
-			Files.createDirectories(directoryPath);
-			System.out.println("Directory " + directoryPath + " created successffuly!");
+			Files.createDirectories(targetDir);
+			System.out.println("Directory " + targetDir + " created successffuly!");
 		} catch (FileAlreadyExistsException e) {
-			System.out.println("File aready exist!");
-			return;
+			System.out.println("Directory " + targetDir + " already exists!");
 		} catch (IOException io) {
-			System.out.println("An I/O error occured!" + io.getMessage());
+			System.out.println("An I/O error occurred while creating directory " + targetDir + ": " + io.getMessage());
 		}
 	}
 	
@@ -30,24 +28,28 @@ public class FileBackupManager {
 		return targetDir.resolve(relativePath);
 	}
 
-	private void filesBeckup(Path sourceDir, Path sourcetPath, Path targetDir){
+	private void filesBeckup(Path sourceDir, Path targetDir){
 		try(Stream<Path> files = Files.walk(sourceDir)){
 			files.forEach(sourcePath -> {
-				Path targetPath = resolveDirectory(sourceDir, sourceDir, targetDir);
+				Path targetPath = resolveDirectory(sourcePath, sourceDir, targetDir); 
 				try {
-					Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+					Files.copy(sourcePath, targetPath);
+					System.out.println("File " + targetPath + " has been backup!");
+				}catch(FileAlreadyExistsException e) {
+					System.out.println("File " + targetPath + " already exist");
 				}catch(IOException io) {
-					
+					System.out.println("Error an IO excepition");
+					io.printStackTrace();
 				}
 			});	
 		}catch (IOException io) {
-			
+			System.out.println("outer!");
 		}
 		
 	}
 	
 	public void backup(Path sourceDir, Path targetDir) throws IOException {
 		createDirectory(targetDir);
-		//filesBeckup(sourceDir, targetDir);
+		filesBeckup(sourceDir, targetDir);
 	}
 }
