@@ -24,7 +24,8 @@ public class FileBackupManager {
 		}
 	}
 	
-	private Path resolveDirectory(Path sourceDir, Path sourcePath, Path targetDir) {
+	//Method will return the resolved Path. I am taking is consideration that the targetDir is in the same root directory. 
+	private Path resolveDirectory(Path sourcePath,Path sourceDir, Path targetDir) {
 		Path relativePath = sourceDir.relativize(sourcePath);
 		return targetDir.resolve(relativePath);
 	}
