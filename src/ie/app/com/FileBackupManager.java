@@ -1,65 +1,94 @@
 package ie.app.com;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
-
+/**
+ * FileBackupManager is responsible for backing up files and directories 
+ * from a source directory to a target directory, preserving the directory structure.
+ */
 public class FileBackupManager {
-	
-	
-	private void createDirectoryIfNeeded(Path targetDir) throws IOException {
-		if (!Files.exists(targetDir)) {
-			Files.createDirectories(targetDir);
-			System.out.println("Directory " + targetDir + " created successffuly!");
-		}
-	}
-	
-	//Method will return the resolved Path. I am taking is consideration that the targetDir is in the same root directory. 
-	private Path resolveDirectory(Path sourcePath,Path sourceDir, Path targetDir) {
-		Path relativePath = sourceDir.relativize(sourcePath);
-		return targetDir.resolve(relativePath);
-	}
-	
-	/*
-	 * private void processPath(Path sourcePath, Path sourceDir, Path targetDir) {
-	 * Path targetPath = resolveDirectory(sourcePath, sourceDir, targetDir);
-	 * 
-	 * try { if(Files.isDirectory(sourcePath)) { createDirectoryIfNeeded(targetDir);
-	 * }else if (Files.isRegularFile(sourcePath)) { Files.copy(sourceDir,
-	 * targetPath, null) } } }
-	 */
 
-	private void filesBackup(Path sourceDir, Path targetDir){
-		try(Stream<Path> files = Files.walk(sourceDir)){
-			files.forEach(sourcePath -> {
-				Path targetPath = resolveDirectory(sourcePath, sourceDir, targetDir); 
-				try {
-					//debug
-					System.out.println();
-					System.out.println("sorce path: " + sourcePath + " / target path is: " + targetPath);
-					System.out.println(Files.exists(targetPath));
-					System.out.println(Files.exists(sourcePath));
-					System.out.println();
-					//debug
-					Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-					System.out.println("File " + targetPath + " has been backup!");
-				}catch(IOException io) {
-					System.out.println("An error occurred while copying " + sourcePath + " to " + targetPath + ": " + io.getMessage());
-				}
-			});	
-		}catch (IOException io) {
-			System.out.println("An I/O error occurred while accessing source directory " + sourceDir + ": " + io.getMessage());
-		}		
-	}
-	
-	public void backup(Path sourceDir, Path targetDir) throws IOException {
-		if(!Files.exists(targetDir)) {
-			createDirectoryIfNeeded(targetDir);
-		}
-		filesBackup(sourceDir, targetDir);
-	}
+    /**
+     * Creates a directory if it does not already exist.
+     *
+     * @param targetDir the directory path to be created
+     * @throws IOException if an I/O error occurs
+     */
+    private void createDirectoryIfNeeded(Path targetDir) throws IOException {
+        if (!Files.exists(targetDir)) {
+            Files.createDirectories(targetDir); // Create the directory, including parent directories if necessary
+            System.out.println("Directory " + targetDir + " created successfully!");
+        }
+    }
+
+    /**
+     * Resolves the corresponding path in the target directory for a given source path.
+     *
+     * @param sourcePath the current path being processed in the source directory
+     * @param sourceDir the root of the source directory
+     * @param targetDir the root of the target directory
+     * @return the resolved target path
+     */
+    private Path resolveDirectory(Path sourcePath, Path sourceDir, Path targetDir) {
+        Path relativePath = sourceDir.relativize(sourcePath); // Get the relative path of the source
+        return targetDir.resolve(relativePath); // Resolve it against the target directory
+    }
+
+    /**
+     * Processes a single path, creating directories in the target if needed or copying files.
+     *
+     * @param sourcePath the current path being processed
+     * @param sourceDir the root of the source directory
+     * @param targetDir the root of the target directory
+     */
+    private void processPath(Path sourcePath, Path sourceDir, Path targetDir) {
+        Path targetPath = resolveDirectory(sourcePath, sourceDir, targetDir); // Resolve the corresponding path in the target directory
+
+        try {
+            if (Files.isDirectory(sourcePath)) {
+                // If it's a directory, ensure the corresponding directory exists in the target
+                createDirectoryIfNeeded(targetPath);
+            } else if (Files.isRegularFile(sourcePath)) {
+                // If it's a file, copy it to the target directory
+                Files.copy(sourcePath, targetPath);
+                System.out.println("File " + targetPath + " has been backed up!");
+            }
+        } catch (IOException io) {
+            // Handle any I/O exceptions and provide feedback
+            System.out.println("An error occurred while copying " + sourcePath + " to " + targetPath + ": " + io.getMessage());
+        }
+    }
+
+    /**
+     * Walks through the source directory tree and processes each path.
+     *
+     * @param sourceDir the root of the source directory
+     * @param targetDir the root of the target directory
+     */
+    private void filesBackup(Path sourceDir, Path targetDir) {
+        try (Stream<Path> files = Files.walk(sourceDir)) { // Walk the file tree starting at sourceDir
+            files.forEach(sourcePath -> processPath(sourcePath, sourceDir, targetDir)); // Process each path
+        } catch (IOException io) {
+            // Handle any I/O errors during traversal
+            System.out.println(
+                "An I/O error occurred while accessing source directory " + sourceDir + ": " + io.getMessage());
+        }
+    }
+
+    /**
+     * Performs the backup operation, ensuring the target directory exists before starting.
+     *
+     * @param sourceDir the root of the source directory
+     * @param targetDir the root of the target directory
+     * @throws IOException if an I/O error occurs
+     */
+    public void backup(Path sourceDir, Path targetDir) throws IOException {
+        if (!Files.exists(targetDir)) {
+            createDirectoryIfNeeded(targetDir); // Ensure the target directory exists
+        }
+        filesBackup(sourceDir, targetDir); // Start the backup process
+    }
 }
