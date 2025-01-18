@@ -6,14 +6,16 @@ import java.nio.file.Paths;
 
 public class Runner {
 	public static void main(String[] args) {
+
+		String UserInputSorce = args.length > 0 ? args[0] : "Test";
 		
-		Path source = Paths.get("Test");
-        Path target = Paths.get("Backup");
+		
+		Path source = Paths.get(UserInputSorce);
 		
 		FileBackupManager backup = new FileBackupManager();
 
 			try {
-				backup.backup(source, target);
+				backup.backup(source.toAbsolutePath());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
