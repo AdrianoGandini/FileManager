@@ -7,12 +7,12 @@ import java.nio.file.Paths;
 public class Runner {
 	public static void main(String[] args) {
 
+		
 		String UserInputSorce = args.length > 0 ? args[0] : "Test";
-		
-		
 		Path source = Paths.get(UserInputSorce);
 		
-		FileBackupManager backup = new FileBackupManager();
+		
+		FileBackupManager backup = new FileBackupManager(new FilesUtility());
 
 			try {
 				backup.backup(source.toAbsolutePath());

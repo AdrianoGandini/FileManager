@@ -5,7 +5,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
 /**
@@ -14,31 +13,12 @@ import java.util.stream.Stream;
  */
 public class FileBackupManager {
 
-    /**
-     * Creates a directory if it does not already exist.
-     *
-     * @param targetDir the directory path to be created
-     * @throws IOException if an I/O error occurs
-     */
-    private void createDirectoryIfNeeded(Path targetDir) throws IOException {
-        if (!Files.exists(targetDir)) {
-            Files.createDirectories(targetDir); // Create the directory, including parent directories if necessary
-            System.out.println("Directory " + targetDir + " created successfully!");
-        }
-    }
+	private FilesUtility utility;
+	
+	public FileBackupManager(FilesUtility utility) {
+		this.utility = utility;
+	}
 
-    /**
-     * Resolves the corresponding path in the target directory for a given source path.
-     *
-     * @param sourcePath the current path being processed in the source directory
-     * @param sourceDir the root of the source directory
-     * @param targetDir the root of the target directory
-     * @return the resolved target path
-     */
-    private Path resolveDirectory(Path sourcePath, Path sourceDir, Path targetDir) {
-        Path relativePath = sourceDir.relativize(sourcePath); // Get the relative path of the source
-        return targetDir.resolve(relativePath); // Resolve it against the target directory
-    }
 
     /**
      * Processes a single path, creating directories in the target if needed or copying files.
@@ -48,12 +28,12 @@ public class FileBackupManager {
      * @param targetDir the root of the target directory
      */
     private void processPath(Path sourcePath, Path sourceDir, Path targetDir) {
-        Path targetPath = resolveDirectory(sourcePath, sourceDir, targetDir); // Resolve the corresponding path in the target directory
+        Path targetPath = utility.resolveDirectory(sourcePath, sourceDir, targetDir); // Resolve the corresponding path in the target directory
 
         try {
             if (Files.isDirectory(sourcePath)) {
                 // If it's a directory, ensure the corresponding directory exists in the target
-                createDirectoryIfNeeded(targetPath);
+                utility.createDirectoryIfNeeded(targetPath);
             } else if (Files.isRegularFile(sourcePath)) {
                 // If it's a file, copy it to the target directory
                 Files.copy(sourcePath, targetPath);
@@ -100,7 +80,7 @@ public class FileBackupManager {
     	Path backupDir = Paths.get(userDir).resolve("Backup");
     	
         if (!Files.exists(backupDir)) {
-            createDirectoryIfNeeded(backupDir); // Ensure the target directory exists
+            utility.createDirectoryIfNeeded(backupDir); // Ensure the target directory exists
         }
         filesBackup(sourceDir, backupDir); // Start the backup process
     }
