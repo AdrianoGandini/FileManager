@@ -1,61 +1,81 @@
 package ie.app.com;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
-//The idea of this class is basically create a logic to identify a file extension and mode to the related folder 
 public class FileOrganizer {
 
-	private Path sorceDir;
-	//I have to create a Data Structure to hold the file name/path and the file extension
-	private Map<Path, String> fileExtensionMap = new HashMap<>();
-	
-	//Constructor
-	public FileOrganizer(Path sorceDir) {
-		this.sorceDir = sorceDir;
-	}
+    private FilesUtility utility;
+    private Map<Path, String> fileExtensionMap = new HashMap<>();
 
-	//First I need a method to return the file extension. I will return a String, check for the index of the last "." and return the substring after.
-	public String getFileExtension(String path) {
-		int last = path.lastIndexOf(".");
-		return path.substring(last + 1).toLowerCase(); 
-	}
-	
-	//A method to go through all the files in the folder and add the filename and extension to the map.
-	public void mapFileExtension(Path path) {
-		if (!Files.exists(path)) {
-			System.out.println("The provided path is not valid: " + path);
-			return;
-		}
-		
-		//TODO
-	}
-	
-	
-	/*
-	 *debug
-	public static void main(String[] args) {
-		FileOrganizerUtility utility = new  FileOrganizerUtility();
-		
-		List<String> testFiles = new ArrayList<>();
-		testFiles.add("Document.pdf");
-        testFiles.add("Image.jpeg");
-        testFiles.add("Archive.zip");
-        testFiles.add("Presentation.pptx");
-        testFiles.add("Spreadsheet.xlsx");
-        testFiles.add("Script.js");
-        testFiles.add("Stylesheet.css");
-        testFiles.add("Executable.exe");
-        testFiles.add("Audio.mp3");
-        testFiles.add("Video.mp4");
-		
-        for (String names : testFiles) {
-        	System.out.println("The file " + names+ " extension is: " + utility.fileExtension(names));
+    public FileOrganizer(FilesUtility utility) {
+        this.utility = utility;
+    }
+
+    private String getFileExtension(Path path) {
+        String fileName = path.getFileName().toString();
+        int lastIndex = fileName.lastIndexOf(".");
+        return (lastIndex == -1) ? "" : fileName.substring(lastIndex + 1).toLowerCase();
+    }
+
+    private void mapFileExtension(Path inputDirectory) throws IOException {
+        if (!Files.exists(inputDirectory) || !Files.isDirectory(inputDirectory)) {
+            System.out.println("The provided path is not valid: " + inputDirectory);
+            return;
         }
-		
-	}
-	
-	*/
+        
+        try (Stream<Path> files = Files.walk(inputDirectory)) {
+            files.filter(Files::isRegularFile).forEach(path -> {
+                String fileExtension = getFileExtension(path);
+                fileExtensionMap.put(path, fileExtension);
+            });
+        } catch (IOException io) {
+            System.err.println("Error processing directory: " + inputDirectory + " - " + io.getMessage());
+        }
+    }
+
+    private void sortFilesByType(Path inputDirectory, Path outputDirectory) throws IOException {
+        for (Map.Entry<Path, String> entry : fileExtensionMap.entrySet()) {
+            Path filePath = entry.getKey();
+            String extension = entry.getValue();
+            
+            
+            Path relativePath = inputDirectory.relativize(filePath);
+            Path extensionDirectory = outputDirectory.resolve(extension);
+            Path resolvedOutputFile = extensionDirectory.resolve(relativePath);
+            
+            
+            utility.createDirectoryIfNeeded(resolvedOutputFile.getParent());
+            
+            try {
+                Files.copy(filePath, resolvedOutputFile, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                System.err.println("Error copying file: " + filePath + " to " + resolvedOutputFile + " - " + e.getMessage());
+            }
+        }
+    }
+
+    public void process(Path inputDirectory, Path outputDirectory) throws IOException {
+        mapFileExtension(inputDirectory);
+        sortFilesByType(inputDirectory, outputDirectory);
+    }
+
+    public static void main(String[] args) {
+        Path test = Paths.get("Test");
+        Path outputTest = Paths.get("OutputTest");
+        
+        FileOrganizer or = new FileOrganizer(new FilesUtility());
+        
+        try {
+            or.process(test, outputTest);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
