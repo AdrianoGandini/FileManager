@@ -87,25 +87,14 @@ public class FileOrganizer {
      * @param outputDirectory the target directory
      * @throws IOException if an error occurs during processing
      */
-    public void process(Path inputDirectory, Path outputDirectory) throws IOException {
+    public void process(Path inputDirectory) throws IOException {
+    	
+    	String userDirectory = System.getProperty("user.home");//Retrieve a string with user home directory
+    	Path backupDirectory = Paths.get(userDirectory).resolve("Backup");
+    	Path outputDirectory = backupDirectory.resolve("Organized");
+   
         mapFileExtension(inputDirectory);
         sortFilesByType(inputDirectory, outputDirectory);
     }
 
-    /**
-     * The main method to run the FileOrganizer.
-     * @param args command line arguments
-     */
-    public static void main(String[] args) {
-        Path test = Paths.get("Test");
-        Path outputTest = Paths.get("OutputTest");
-        
-        FileOrganizer or = new FileOrganizer(new FilesUtility());
-        
-        try {
-            or.process(test, outputTest);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
