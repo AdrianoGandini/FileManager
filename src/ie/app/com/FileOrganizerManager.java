@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  * The FileOrganizer class organizes files by their extensions.
  * It scans files in a directory and sorts them into separate folders.
  */
-public class FileOrganizer {
+public class FileOrganizerManager {
 
     private FilesUtility utility;
     private Map<Path, String> fileExtensionMap = new HashMap<>();
@@ -24,7 +24,7 @@ public class FileOrganizer {
      * Constructor to initialize the FileOrganizer with a utility instance.
      * @param utility an instance of FilesUtility
      */
-    public FileOrganizer(FilesUtility utility) {
+    public FileOrganizerManager(FilesUtility utility) {
         this.utility = utility;
     }
 
