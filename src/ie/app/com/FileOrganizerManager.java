@@ -87,14 +87,15 @@ public class FileOrganizerManager {
      * @param outputDirectory the target directory
      * @throws IOException if an error occurs during processing
      */
-    public void process(Path inputDirectory) throws IOException {
+    public void process(Path inputDirectory, Path outputDirectory) throws IOException {
     	
-    	String userDirectory = System.getProperty("user.home");//Retrieve a string with user home directory
-    	Path backupDirectory = Paths.get(userDirectory).resolve("Backup");
-    	Path outputDirectory = backupDirectory.resolve("Organized");
+    	//String userDirectory = System.getProperty("user.home");//Retrieve a string with user home directory
+    	
+    	Path backupDirectory = outputDirectory.resolve("Backup");
+    	Path finalOutputDirectory = backupDirectory.resolve("Organized");
    
         mapFileExtension(inputDirectory);
-        sortFilesByType(inputDirectory, outputDirectory);
+        sortFilesByType(inputDirectory, finalOutputDirectory);
     }
 
 }

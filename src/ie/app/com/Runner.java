@@ -16,7 +16,7 @@ public class Runner {
 		FileOrganizerManager organizer = new FileOrganizerManager(new FilesUtility());
 
 			try {
-				organizer.process(source);
+				//organizer.process(source);
 				backup.backup(source.toAbsolutePath());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

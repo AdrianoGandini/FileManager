@@ -3,9 +3,21 @@ package ie.app.com;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Toolkit;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 public class FileOrganizerFrame extends JFrame {
 
@@ -26,7 +38,13 @@ public class FileOrganizerFrame extends JFrame {
 		});
 	}
 
+	private FileBackupManager backupManager;
+	private FileOrganizerManager organizerManager;
+	
 	public FileOrganizerFrame() {
+		backupManager = new FileBackupManager(new FilesUtility());
+		organizerManager = new FileOrganizerManager(new FilesUtility());
+		
 		setupFrame();
 		setupMenuBar();
 		setupContentPane();
@@ -75,35 +93,48 @@ public class FileOrganizerFrame extends JFrame {
 
 	// Add path fields and buttons
 	private void setupInputFields() {
+		
+		// Select the folder to back up
 		JLabel backupPathLabel = new JLabel("File Backup Path");
 		backupPathLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		backupPathLabel.setBounds(139, 91, 168, 42);
 		contentPane.add(backupPathLabel);
 
+		// Select the folder to back up text field
 		backupPathField = new JTextField();
 		backupPathField.setBounds(315, 97, 266, 31);
 		contentPane.add(backupPathField);
 		backupPathField.setColumns(10);
 
+		// Select the folder to back up button
 		JButton selectBackupPathButton = new JButton("Select File Path");
 		selectBackupPathButton.setBounds(315, 138, 129, 21);
 		selectBackupPathButton.addActionListener(e -> chooseDirectory(backupPathField));
 		contentPane.add(selectBackupPathButton);
 
-		JLabel organizePathLabel = new JLabel("File Organize Path");
+		// Backup Output Directory path
+		JLabel organizePathLabel = new JLabel("Backup Output Path");
 		organizePathLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		organizePathLabel.setBounds(139, 204, 168, 42);
 		contentPane.add(organizePathLabel);
 
+		// Backup Output Directory path text field
 		organizePathField = new JTextField();
 		organizePathField.setBounds(315, 210, 266, 31);
 		contentPane.add(organizePathField);
 		organizePathField.setColumns(10);
 
+		// Backup Output Directory button
 		JButton selectOrganizePathButton = new JButton("Select File Path");
 		selectOrganizePathButton.setBounds(315, 251, 129, 21);
 		selectOrganizePathButton.addActionListener(e -> chooseDirectory(organizePathField));
 		contentPane.add(selectOrganizePathButton);
+		
+		//Run application button
+		JButton runBackupButton = new JButton("Run");
+		runBackupButton.setBounds(315, 290, 168, 21);
+		runBackupButton.addActionListener(e -> runBackup());
+		contentPane.add(runBackupButton);
 	}
 
 	// Common logic for choosing a directory
@@ -119,7 +150,7 @@ public class FileOrganizerFrame extends JFrame {
 
 	// Menu item: "Open"
 	private void handleOpenDirectory(ActionEvent e) {
-		chooseDirectory(new JTextField()); // You can adapt this logic as needed
+		chooseDirectory(new JTextField());
 	}
 
 	// Menu item: "Exit"
@@ -141,5 +172,31 @@ public class FileOrganizerFrame extends JFrame {
 				this,
 				"File Organizer\nVersion: 1.0.0\nReleased Date: January 2025\n© 2025 All rights reserved."
 		);
+	}
+	
+	private void runBackup() {
+		
+		//Variable to hold the directory to be back up
+		String inputDirectory = backupPathField.getText();
+		Path inputDirectoryPath = Paths.get(inputDirectory);
+
+		
+		//Output directory 
+		String outputDirectory = organizePathField.getText();
+		Path outputDirectoryPath = Paths.get(outputDirectory); //Still have to create the logic to accept the output directory. The actual one sent directly to user directory
+		
+		
+		if (inputDirectory.isEmpty() || outputDirectory.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Please select both paths first.");
+	        return;
+		}
+		
+		try {
+			backupManager.backup(inputDirectoryPath);
+			organizerManager.process(inputDirectoryPath, outputDirectoryPath);
+			JOptionPane.showMessageDialog(this, "Backup completed successfully.");
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(this, "Error during backup: " + ex.getMessage());
+		}
 	}
 }
