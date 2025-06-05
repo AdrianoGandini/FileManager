@@ -13,8 +13,10 @@ public class Runner {
 		
 		
 		FileBackupManager backup = new FileBackupManager(new FilesUtility());
+		FileOrganizerManager organizer = new FileOrganizerManager(new FilesUtility());
 
 			try {
+				organizer.process(source);
 				backup.backup(source.toAbsolutePath());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
