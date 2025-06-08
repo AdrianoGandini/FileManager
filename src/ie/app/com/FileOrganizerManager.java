@@ -1,12 +1,12 @@
 package ie.app.com;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.LinkOption;
 import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -71,7 +71,7 @@ public class FileOrganizerManager {
             Path filePath = entry.getKey();
             String extension = entry.getValue();
             
-            Path relativePath = inputDirectory.relativize(filePath);
+            Path relativePath = inputDirectory.relativize(filePath); 
             Path extensionDirectory = outputDirectory.resolve(extension);
             Path resolvedOutputFile = extensionDirectory.resolve(relativePath);
             
@@ -89,9 +89,11 @@ public class FileOrganizerManager {
      */
     public void process(Path inputDirectory, Path outputDirectory) throws IOException {
     	
+    	LocalDate today = LocalDate.now();
+    	
     	//String userDirectory = System.getProperty("user.home");//Retrieve a string with user home directory
     	
-    	Path backupDirectory = outputDirectory.resolve("Backup");
+    	Path backupDirectory = outputDirectory.resolve("Backup - " + today);
     	Path finalOutputDirectory = backupDirectory.resolve("Organized");
    
         mapFileExtension(inputDirectory);
