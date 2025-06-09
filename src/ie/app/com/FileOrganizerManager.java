@@ -19,6 +19,7 @@ public class FileOrganizerManager {
 
     private FilesUtility utility;
     private Map<Path, String> fileExtensionMap = new HashMap<>();
+    
 
     /**
      * Constructor to initialize the FileOrganizer with a utility instance.
@@ -26,8 +27,10 @@ public class FileOrganizerManager {
      */
     public FileOrganizerManager(FilesUtility utility) {
         this.utility = utility;
+
     }
 
+    
     /**
      * Gets the file extension from a given file path.
      * @param path the file path
