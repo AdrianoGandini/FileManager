@@ -9,7 +9,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 /**
@@ -68,20 +67,20 @@ public class FileOrganizerManager {
     }
     
     /**
-     * 
-     * @param extension
-     * @return
+     * Gets the category for a given file extension
+     * @param extension the file extension to be categorized
+     * @return the category name associated with the extension, or "Miscellaneous" if not found
      */
     private String getExtensionCategory(String extension) {
-    	Map<String, String> categories = category.getExtensionMap();
-    	
-    	//Logic to compare the extension with the categories on the categories Map
-    	for(Map.Entry<String, String> entry : categories.entrySet()) {
-    		if (extension.equals(entry.getKey())) {
-    			return entry.getValue();
-    		}
-    	} 
-    	return "Miscelanius";
+        Map<String, String> categories = category.getExtensionMap();
+        
+        //Logic to compare the extension with the categories on the categories Map
+        for(Map.Entry<String, String> entry : categories.entrySet()) {
+            if (extension.equals(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        return "Miscellaneous";
     }
 
     /**
@@ -93,14 +92,11 @@ public class FileOrganizerManager {
     private void sortFilesByType(Path inputDirectory, Path outputDirectory) throws IOException {
         for (Map.Entry<Path, String> entry : fileExtensionMap.entrySet()) {
             Path filePath = entry.getKey();
-            String extension = entry.getValue(); //change the variable name as it will from now hold the category. 
-            
-            //Way to get the sub folder from ExtensionCategory
-            //After change the path to add the sub folder
+            String category = entry.getValue(); 
             
             Path relativePath = inputDirectory.relativize(filePath); 
-            Path extensionDirectory = outputDirectory.resolve(extension);
-            Path resolvedOutputFile = extensionDirectory.resolve(relativePath);
+            Path extensionCategory = outputDirectory.resolve(category);
+            Path resolvedOutputFile = extensionCategory.resolve(relativePath);
             
             utility.createDirectoryIfNeeded(resolvedOutputFile.getParent());
             
@@ -119,6 +115,7 @@ public class FileOrganizerManager {
     	
     	LocalDate today = LocalDate.now();
     	
+    	//This line was created before the user be able to select the output file directory. Kept as per learning proposes.
     	//String userDirectory = System.getProperty("user.home");//Retrieve a string with user home directory
     	
     	Path backupDirectory = outputDirectory.resolve("Backup - " + today);
