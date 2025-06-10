@@ -40,10 +40,11 @@ public class FileOrganizerFrame extends JFrame {
 
 	private FileBackupManager backupManager;
 	private FileOrganizerManager organizerManager;
+
 	
 	public FileOrganizerFrame() {
 		backupManager = new FileBackupManager(new FilesUtility());
-		organizerManager = new FileOrganizerManager(new FilesUtility());
+		organizerManager = new FileOrganizerManager(new FilesUtility(), new ExtensionCategory());
 		
 		setupFrame();
 		setupMenuBar();

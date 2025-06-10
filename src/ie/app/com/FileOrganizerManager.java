@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 /**
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
 public class FileOrganizerManager {
 
     private FilesUtility utility;
+    private ExtensionCategory category;
     private Map<Path, String> fileExtensionMap = new HashMap<>();
     
 
@@ -25,8 +27,9 @@ public class FileOrganizerManager {
      * Constructor to initialize the FileOrganizer with a utility instance.
      * @param utility an instance of FilesUtility
      */
-    public FileOrganizerManager(FilesUtility utility) {
+    public FileOrganizerManager(FilesUtility utility, ExtensionCategory category) {
         this.utility = utility;
+        this.category = category;
 
     }
 
@@ -56,11 +59,24 @@ public class FileOrganizerManager {
         try (Stream<Path> files = Files.walk(inputDirectory, FileVisitOption.FOLLOW_LINKS)) {
             files.filter(Files::isRegularFile).forEach(path -> {
                 String fileExtension = getFileExtension(path);
-                fileExtensionMap.put(path, fileExtension);
+                String extensionCategory = getExtensionCategory(fileExtension); //Method that will compare with the ExtensionCatgory
+                fileExtensionMap.put(path, extensionCategory); //If it works I have to change the comments to match with the new logic 
             });
         } catch (IOException io) {
             System.err.println("Error processing directory: " + inputDirectory + " - " + io.getMessage());
         }
+    }
+    
+    private String getExtensionCategory(String extension) {
+    	Map<String, String> categories = category.getExtensionMap();
+    	
+    	//Logic to compare the extension with the categories on the categories Map
+    	for(Map.Entry<String, String> entry : categories.entrySet()) {
+    		if (extension == entry.getKey()) {
+    			return entry.getValue();
+    		}
+    	}
+    	return "Miscelanius";
     }
 
     /**
@@ -72,7 +88,10 @@ public class FileOrganizerManager {
     private void sortFilesByType(Path inputDirectory, Path outputDirectory) throws IOException {
         for (Map.Entry<Path, String> entry : fileExtensionMap.entrySet()) {
             Path filePath = entry.getKey();
-            String extension = entry.getValue();
+            String extension = entry.getValue(); //change the variable name as it will from now hold the category. 
+            
+            //Way to get the sub folder from ExtensionCategory
+            //After change the path to add the sub folder
             
             Path relativePath = inputDirectory.relativize(filePath); 
             Path extensionDirectory = outputDirectory.resolve(extension);
@@ -83,6 +102,7 @@ public class FileOrganizerManager {
             Files.copy(filePath, resolvedOutputFile, StandardCopyOption.REPLACE_EXISTING);
         }
     }
+    
 
     /**
      * Processes files by mapping their extensions and sorting them into folders.
