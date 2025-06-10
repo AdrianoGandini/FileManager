@@ -19,6 +19,17 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+/**
+ * File Organizer application main frame.
+ * 
+ * This application provides a GUI for backing up and organizing files
+ * from an input directory to an output directory.
+ * 
+ * @author Adriano Gandini
+ * @version 1.0.0
+ * @since 2025-01-01
+ */
+
 public class FileOrganizerFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -27,6 +38,12 @@ public class FileOrganizerFrame extends JFrame {
 	private JTextField backupPathField;
 	private JTextField organizePathField;
 
+	
+	/**
+     * Application entry point.
+     * 
+     * @param args command line arguments (not used)
+     */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(() -> {
 			try {
@@ -41,7 +58,10 @@ public class FileOrganizerFrame extends JFrame {
 	private FileBackupManager backupManager;
 	private FileOrganizerManager organizerManager;
 
-	
+	/**
+	 * Constructor for the main application frame.
+	 * Initializes manager classes and sets up all GUI components.
+	 */
 	public FileOrganizerFrame() {
 		backupManager = new FileBackupManager(new FilesUtility());
 		organizerManager = new FileOrganizerManager(new FilesUtility(), new ExtensionCategory());
@@ -52,7 +72,9 @@ public class FileOrganizerFrame extends JFrame {
 		setupInputFields();
 	}
 
-	// Set up basic window
+	/**
+	 * Configures basic window properties such as title, icon, size, and close behavior.
+	 */
 	private void setupFrame() {
 		setTitle("File Organizer");
 		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\fabbroa\\Documents\\FileOrganizer\\logo.jpg"));
@@ -60,7 +82,11 @@ public class FileOrganizerFrame extends JFrame {
 		setBounds(100, 100, 826, 488);
 	}
 
-	// Set up top menu bar
+	/**
+	 * Creates and configures the menu bar with File and Help menus.
+	 * File menu contains Open and Exit options.
+	 * Help menu contains Version information.
+	 */
 	private void setupMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -84,7 +110,9 @@ public class FileOrganizerFrame extends JFrame {
 		helpMenu.add(versionMenuItem);
 	}
 
-	// Set up main content pane
+	/**
+	 * Sets up the main content panel with border and layout.
+	 */
 	private void setupContentPane() {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -92,7 +120,13 @@ public class FileOrganizerFrame extends JFrame {
 		setContentPane(contentPane);
 	}
 
-	// Add path fields and buttons
+	/**
+	 * Creates and positions all input fields, labels, and buttons for the main interface.
+	 * This includes:
+	 * - Source directory selection (backup path)
+	 * - Destination directory selection (organize path)  
+	 * - Action buttons for directory selection and running backup
+	 */
 	private void setupInputFields() {
 		
 		// Select the folder to back up
@@ -138,7 +172,12 @@ public class FileOrganizerFrame extends JFrame {
 		contentPane.add(runBackupButton);
 	}
 
-	// Common logic for choosing a directory
+	/**
+	 * Utility method to open a directory chooser dialog and populate a text field.
+	 * This method is reused for both source and destination directory selection.
+	 * 
+	 * @param targetField The text field to populate with the selected directory path
+	 */
 	private void chooseDirectory(JTextField targetField) {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -167,7 +206,12 @@ public class FileOrganizerFrame extends JFrame {
 		}
 	}
 
-	// Menu item: "Version"
+	/**
+	 * Event handler for the "Version" menu item.
+	 * Displays application version and copyright information.
+	 * 
+	 * @param e The action event (not used)
+	 */
 	private void showVersionDialog(ActionEvent e) {
 		JOptionPane.showMessageDialog(
 				this,
@@ -175,25 +219,34 @@ public class FileOrganizerFrame extends JFrame {
 		);
 	}
 	
+	/**
+	 * Executes the backup and organization process.
+	 * This method:
+	 * 1. Validates that both paths are selected
+	 * 2. Converts string paths to Path objects
+	 * 3. Calls backup manager to backup files
+	 * 4. Calls organizer manager to organize files
+	 * 5. Shows success or error messages
+	 */
 	private void runBackup() {
 		
-		//Variable to hold the directory to be back up
+		// Get the source directory path from the text field
 		String inputDirectory = backupPathField.getText();
 		Path inputDirectoryPath = Paths.get(inputDirectory);
 
 		
-		//Output directory 
+		// Get the destination directory path from the text field 
 		String outputDirectory = organizePathField.getText();
 		Path outputDirectoryPath = Paths.get(outputDirectory); //Still have to create the logic to accept the output directory. The actual one sent directly to user directory
 		
-		
+		// Validate that both paths have been selected
 		if (inputDirectory.isEmpty() || outputDirectory.isEmpty()) {
 			JOptionPane.showMessageDialog(this, "Please select both paths first.");
 	        return;
 		}
 		
 		try {
-			backupManager.backup(inputDirectoryPath);
+			// This processes files from input directory and organizes them in output directory
 			organizerManager.process(inputDirectoryPath, outputDirectoryPath);
 			JOptionPane.showMessageDialog(this, "Backup completed successfully.");
 		} catch (Exception ex) {
