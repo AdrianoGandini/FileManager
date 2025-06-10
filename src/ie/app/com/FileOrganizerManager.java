@@ -67,15 +67,20 @@ public class FileOrganizerManager {
         }
     }
     
+    /**
+     * 
+     * @param extension
+     * @return
+     */
     private String getExtensionCategory(String extension) {
     	Map<String, String> categories = category.getExtensionMap();
     	
     	//Logic to compare the extension with the categories on the categories Map
     	for(Map.Entry<String, String> entry : categories.entrySet()) {
-    		if (extension == entry.getKey()) {
+    		if (extension.equals(entry.getKey())) {
     			return entry.getValue();
     		}
-    	}
+    	} 
     	return "Miscelanius";
     }
 

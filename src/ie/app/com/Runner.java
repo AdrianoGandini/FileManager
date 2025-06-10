@@ -13,7 +13,7 @@ public class Runner {
 		
 		
 		FileBackupManager backup = new FileBackupManager(new FilesUtility());
-		FileOrganizerManager organizer = new FileOrganizerManager(new FilesUtility());
+		//FileOrganizerManager organizer = new FileOrganizerManager(new FilesUtility());
 
 			try {
 				//organizer.process(source);
